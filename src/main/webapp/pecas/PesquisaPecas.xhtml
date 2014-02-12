@@ -1,0 +1,77 @@
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="titulo">Pesquisa de peças</ui:define>
+    
+    <ui:define name="corpo">
+    	<h:form id="frmPesquisa">
+	    	<h1>Pesquisa de peças</h1>
+	    	
+	    	<p:messages autoUpdate="true" closable="true" />
+	    	
+	    	<p:toolbar style="margin-top: 20px">
+	    		<p:toolbarGroup>
+                	<p:commandButton value="Pesquisar" action="#{pesquisaPecasBean.pesquisar}"
+                    	update="@form" />
+                </p:toolbarGroup>
+	    		<p:toolbarGroup align="right">
+	    			<p:button value="Nova" outcome="/pecas/CadastroPeca" />
+	    		</p:toolbarGroup>
+	    	</p:toolbar>
+	    	
+	    	<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+                	columnClasses="rotulo, campo">
+	            <p:outputLabel value="Código" for="codigo"/>
+	            <p:inputText id="codigo" size="20" value="#{pesquisaPecasBean.filtro.codigo}" />
+	            
+	            <p:outputLabel value="Nome" for="nome"/>
+	            <p:inputText id="nome" size="60" value="#{pesquisaPecasBean.filtro.nome}" />
+            </p:panelGrid>
+	    	
+	    	<p:dataTable id="pecasTable" value="#{pesquisaPecasBean.pecasFiltradas}" var="peca"
+	    		style="margin-top: 20px" emptyMessage="Nenhuma peça encontrada." rows="30"
+	    		paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom">
+	    		<p:column headerText="Código" style="text-align: center; width: 100px">
+	    			<h:outputText value="#{peca.codigo}"/>
+	    		</p:column>
+	    		<p:column headerText="Nome">
+	    			<h:outputText value="#{peca.nome}" />
+	    		</p:column>
+	    		<p:column headerText="Descrição" style="width: 200px">
+	    			<h:outputText value="#{peca.descricao}" />
+	    		</p:column>
+	    		<p:column headerText="Quantidade em estoque">
+	    			<h:outputText value="#{peca.quantidadeTotal}" />
+	    		</p:column>
+	    		<p:column headerText="Custo unitário">
+	    			<h:outputText value="#{peca.custoUnitario}">
+	    				<f:convertNumber type="currency"/>
+	    			</h:outputText>
+	    		</p:column>
+	    		
+	    		<p:column style="width: 100px; text-align: center">
+	    			<p:button icon="ui-icon-pencil" title="Editar" outcome="/pecas/CadastroPeca">
+	    				<f:param name="peca" value="#{peca.codigo}"/>
+	    			</p:button>
+	    			<p:commandButton icon="ui-icon-trash" title="Excluir" oncomplete="confirmacaoExclusao.show()" 
+	    					process="@this" >
+                    	<f:setPropertyActionListener target="#{pesquisaPecasBean.pecaSelecionada}"
+                    		value="#{peca}" />
+                    </p:commandButton>
+	    		</p:column>
+	    	</p:dataTable>
+	    	
+	    	<p:confirmDialog header="Exclusão de peça" message="Tem certeza que deseja excluir a peça?"
+	    			widgetVar="confirmacaoExclusao" >
+	    		<p:button value="Não" onclick="confirmacaoExclusao.hide(); return false;" />
+	    		<p:commandButton value="Sim" oncomplete="confirmacaoExclusao.hide();" 
+	    				action="#{pesquisaPecasBean.excluir}" process="@this"
+                        update=":frmPesquisa:pecasTable"/>
+	    	</p:confirmDialog>
+    	</h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,67 @@
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:o="http://omnifaces.org/ui">
+
+    <ui:define name="titulo">#{novoPedidoBean.editando ? 'Edição do pedido' : 'Novo pedido'}</ui:define>
+    
+    <ui:define name="corpo">
+    	<f:metadata>
+    		<o:viewParam name="pedido" value="#{novoPedidoBean.pedido}"/>
+    	</f:metadata>
+    	
+    	<h:form id="frmPedido">
+	    	<h1>#{novoPedidoBean.editando ? 'Edição do pedido' : 'Novo pedido'}</h1>
+	    	
+	    	<p:messages autoUpdate="true" closable="true" />
+	    	
+	    	<p:toolbar style="margin-top: 20px">
+	    		<p:toolbarGroup>
+	    			<p:button value="Novo" outcome="/pedidos/NovoPedido"/>
+	    			<p:commandButton value="Salvar" id="botaoSalvar" action="#{novoPedidoBean.salvar}" update="@form"/>
+	    		</p:toolbarGroup>
+	    		<p:toolbarGroup align="right">
+	    			<p:button value="Pesquisa" outcome="/pedidos/PesquisaPedidos"/>
+	    		</p:toolbarGroup>
+	    	</p:toolbar>
+	    	
+	    	<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+	    		<p:outputLabel value="Cliente" for="cliente"/>
+	    		<p:autoComplete id="cliente" completeMethod="#{novoPedidoBean.sugerirClientes}"
+	    				forceSelection="true" var="c" itemLabel="#{c.nome}" itemValue="#{c}" 
+	    				converter="clienteConverter" minQueryLength="1" maxResults="15" size="40" 
+	    				dropdown="true" value="#{novoPedidoBean.pedido.cliente}">
+	    		</p:autoComplete>
+	    			
+	    		<p:outputLabel value="Data" for="data"/>
+	    		<p:calendar id="data" pattern="dd/MM/yyyy" locale="pt" value="#{novoPedidoBean.pedido.data}" />
+	    		
+	    		<p:outputLabel value="Valor de desconto" for="valorDesconto"/>
+	    		<p:inputText id="valorDesconto" styleClass="moeda" value="#{novoPedidoBean.pedido.desconto}">
+	    			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+	    			<p:ajax event="change" update=":frmPedido:totalPedido :frmPedido:tabView" process="@this" 
+							listener="#{novoPedidoBean.atualizarDesconto}"/>
+	    		</p:inputText>
+	    		
+	    		<p:outputLabel value="Total pedido" for="totalPedido" style="font-weight: bold"/>
+	    		<h:outputText id="totalPedido" style="font-weight: bold" value="#{novoPedidoBean.pedido.valorTotal}">
+	    			<f:convertNumber type="currency"/>
+	    		</h:outputText>
+	    	</p:panelGrid>
+	    	
+	    	<p:tabView style="margin-top: 20px" id="tabView" activeIndex="#{novoPedidoBean.tabAtiva}">
+	    		<p:ajax event="tabChange" process="@this" listener="#{novoPedidoBean.alterarTab}"/>
+            	<p:tab title="Itens" id="tabItens">
+                	<ui:include src="/WEB-INF/template/pedidos/ItensPedido.xhtml" />
+                </p:tab>
+                <p:tab title="Pagamento" id="tabPagamento">
+                	<ui:include src="/WEB-INF/template/pedidos/Pagamento.xhtml" />
+                </p:tab>
+            </p:tabView>
+    	</h:form>
+    </ui:define>
+</ui:composition>

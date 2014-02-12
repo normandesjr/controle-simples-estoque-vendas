@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	    xmlns:h="http://java.sun.com/jsf/html"
+	    xmlns:f="http://java.sun.com/jsf/core"
+	    xmlns:ui="http://java.sun.com/jsf/facelets"
+	    xmlns:p="http://primefaces.org/ui">
+
+	<p:panelGrid columns="2" id="painelItensPedido" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+
+		<p:outputLabel value="Peça" for="peca"/>
+		<p:autoComplete id="peca" completeMethod="#{novoPedidoBean.sugerirPecas}"
+				forceSelection="true" var="p" itemLabel="#{p.nome}" itemValue="#{p}" 
+				converter="pecaConverter" minQueryLength="1" maxResults="15" size="40" 
+				dropdown="true" value="#{novoPedidoBean.itemPedido.peca}">
+			<p:column>
+				#{p.codigo} - #{p.nome}
+			</p:column>
+			<p:ajax event="itemSelect" update=":frmPedido:tabView:valorUnitario :frmPedido:tabView:adicionarItem"
+				listener="#{novoPedidoBean.carregarValoresPeca}" process="@this"/>
+		</p:autoComplete>
+		
+		<p:outputLabel value="Quantidade" for="quantidade"/>
+		<p:inputText id="quantidade" size="3" styleClass="inteiro" value="#{novoPedidoBean.itemPedido.quantidade}" />
+	    
+	    <p:outputLabel value="Valor unitário"/>
+	    <p:inputText value="#{novoPedidoBean.itemPedido.valorUnitario}" styleClass="moeda" id="valorUnitario">
+	    	<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+	    </p:inputText>
+	    
+	    <h:outputText/>
+	    <p:commandButton id="adicionarItem" value="Adicionar" disabled="#{novoPedidoBean.itemPedido.peca == null}" 
+	    		action="#{novoPedidoBean.adicionarItem}" update=":frmPedido:totalPedido :frmPedido:tabView"
+	    		process="@this quantidade valorUnitario"/>
+	</p:panelGrid>
+	
+	<p:dataTable id="tabelaItens" style="margin-top: 20px" emptyMessage="Nenhum item adicionado."
+			value="#{novoPedidoBean.pedido.itensDoPedido}" var="itemPedido" rowIndexVar="linha">
+		<p:column headerText="Peça">
+			<h:outputText value="#{itemPedido.peca.codigo} - #{itemPedido.peca.nome}"/>
+		</p:column>
+		<p:column headerText="Valor unitário">
+			<h:outputText value="#{itemPedido.valorUnitario}">
+				<f:convertNumber type="currency" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="Quantidade">
+			<p:inputText size="3" value="#{itemPedido.quantidade}" styleClass="inteiro" label="Quantidade">
+				<p:ajax event="change" update=":frmPedido:tabView :frmPedido:totalPedido" process="@this" 
+					listener="#{novoPedidoBean.atualizarQuantidadeItem}"/>
+			</p:inputText>
+		</p:column>
+		<p:column headerText="Total">
+			<h:outputText value="#{itemPedido.valorTotal}">
+				<f:convertNumber type="currency"/>
+			</h:outputText>
+		</p:column>
+		
+		<p:column style="width: 100px; text-align: center">
+  			<p:commandButton icon="ui-icon-trash" title="Excluir" process="@this" 
+  				action="#{novoPedidoBean.excluirItem(linha)}" update=":frmPedido:tabView :frmPedido:totalPedido"/>
+  		</p:column>
+	</p:dataTable>
+          
+</ui:composition>

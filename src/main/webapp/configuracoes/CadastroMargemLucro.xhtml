@@ -1,0 +1,82 @@
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="titulo">Configuração da Margem de Lucro</ui:define>
+    
+    <ui:define name="corpo">
+    	<h:form id="frmCadastro">
+	    	<h1>Configuração da Margem de Lucro</h1>
+	    	
+	    	<p:messages autoUpdate="true" closable="true"/>
+	    	
+	    	<p:toolbar style="margin-top: 20px">
+	    		<p:toolbarGroup>
+	    			<p:button value="Nova" outcome="/configuracoes/CadastroMargemLucro"/>
+	    			<p:commandButton value="Salvar" id="botaoSalvar" action="#{cadastroMargemLucroBean.salvar}" update="margensLucroTable painel"/>
+	    		</p:toolbarGroup>
+	    	</p:toolbar>
+	    	
+	    	<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+	    		<p:outputLabel value="Custo inicial" for="custoInicial"/>
+	    		<p:inputText id="custoInicial" styleClass="moeda"
+	    				value="#{cadastroMargemLucroBean.margemLucro.custoInicial}">
+	    			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+	    		</p:inputText>
+	    		
+	    		<p:outputLabel value="Custo final" for="custoFinal"/>
+	    		<p:inputText id="custoFinal" styleClass="moeda" 
+	    				value="#{cadastroMargemLucroBean.margemLucro.custoFinal}">
+	    			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+	    		</p:inputText>
+	    		
+	    		<p:outputLabel value="Fator multiplicação" for="fatorMultiplicacao"/>
+	    		<p:inputText id="fatorMultiplicacao" styleClass="moeda"
+	    				value="#{cadastroMargemLucroBean.margemLucro.fatorMultiplicacao}">
+	    			<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+	    		</p:inputText>
+	    	</p:panelGrid>
+	    	
+	    	<p:dataTable id="margensLucroTable" value="#{cadastroMargemLucroBean.margensLucro}" var="margemLucro"
+	    		style="margin-top: 20px" emptyMessage="Nenhuma margem de lucro encontrada." rows="30"
+	    		paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom">
+	    		<p:column headerText="Custo inicial" style="text-align: center; width: 100px">
+	    			<h:outputText value="#{margemLucro.custoInicial}">
+	    				<f:convertNumber type="currency"/>
+	    			</h:outputText>
+	    		</p:column>
+	    		<p:column headerText="Custo final" style="text-align: center; width: 100px">
+	    			<h:outputText value="#{margemLucro.custoFinal}">
+	    				<f:convertNumber type="currency"/>
+	    			</h:outputText>
+	    		</p:column>
+	    		<p:column headerText="Fator de multiplicação" style="text-align: center; width: 100px">
+	    			<h:outputText value="#{margemLucro.fatorMultiplicacao}">
+	    				<f:convertNumber type="number" maxFractionDigits="2" minFractionDigits="2"/>
+	    			</h:outputText>
+	    		</p:column>
+	    		
+	    		<p:column style="width: 100px; text-align: center">
+	    			<p:commandButton icon="ui-icon-trash" title="Excluir" oncomplete="confirmacaoExclusao.show()" 
+	    					process="@this" >
+                    	<f:setPropertyActionListener target="#{cadastroMargemLucroBean.margemLucroSelecionada}"
+                    		value="#{margemLucro}" />
+                    </p:commandButton>
+	    		</p:column>
+	    	</p:dataTable>
+	    	
+	    	<p:confirmDialog header="Exclusão de margem de lucro" message="Tem certeza que deseja excluir a margem de lucro?"
+	    			widgetVar="confirmacaoExclusao" >
+	    		<p:button value="Não" onclick="confirmacaoExclusao.hide(); return false;" />
+	    		<p:commandButton value="Sim" oncomplete="confirmacaoExclusao.hide();" 
+	    				action="#{cadastroMargemLucroBean.excluir}" process="@this"
+                        update=":frmCadastro:margensLucroTable"/>
+	    	</p:confirmDialog>
+	    	
+	    </h:form>
+    </ui:define>
+</ui:composition>

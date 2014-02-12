@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	    xmlns:h="http://java.sun.com/jsf/html"
+	    xmlns:f="http://java.sun.com/jsf/core"
+	    xmlns:ui="http://java.sun.com/jsf/facelets"
+	    xmlns:p="http://primefaces.org/ui">
+
+	<p:panelGrid columns="2" id="painelPagamento" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+
+		<p:outputLabel value="Forma de pagamento" for="formaPagamento"/>
+		<p:selectOneMenu id="formaPagamento" style="width: 100px" value="#{novoPedidoBean.pedido.pagamento.formaPagamento}">
+			<f:selectItem itemLabel="Selecione" itemValue=""/>
+			<f:selectItems value="#{novoPedidoBean.formasPagamento}" var="formaPagamento" 
+				itemLabel="#{formaPagamento.descricao}" itemValue="#{formaPagamento}"/>
+			<p:ajax event="change" process="@this" update=":frmPedido:tabView" listener="#{novoPedidoBean.atualizarFormaPagamento}"/>
+		</p:selectOneMenu>
+		
+		<p:outputLabel value="Número de parcelas" for="numeroParcelas"/>
+		<p:inputText id="numeroParcelas" value="#{novoPedidoBean.pedido.pagamento.numeroParcelas}" 
+				size="5" styleClass="inteiro" rendered="#{novoPedidoBean.pedido.pagamento.parcelado}">
+			<p:ajax event="change" process="@this" update=":frmPedido:tabView:tabelaParcelas" 
+				listener="#{novoPedidoBean.atualizarParcelas}"/>
+		</p:inputText>
+		<h:outputText value="1" rendered="#{!novoPedidoBean.pedido.pagamento.parcelado}"/>
+		
+	</p:panelGrid>
+	
+	<p:dataTable id="tabelaParcelas" style="margin-top: 20px" value="#{novoPedidoBean.pedido.pagamento.parcelas}"
+			var="parcela" emptyMessage="Nenhuma parcela adicionada.">
+		<p:column headerText="Número da parcela">
+			<h:outputText value="#{parcela.numero}"/>
+		</p:column>
+		
+		<p:column headerText="Valor da parcela">
+			<h:outputText value="#{parcela.valor}">
+				<f:convertNumber type="currency"/>
+			</h:outputText>
+		</p:column>
+		
+		<p:column headerText="Vencimento">
+			<p:calendar value="#{parcela.vencimento}" pattern="dd/MM/yyyy" locale="pt"/>
+		</p:column>
+		
+		<p:column headerText="Recebido?">
+			<h:panelGroup>
+	    		<p:selectBooleanCheckbox value="#{parcela.recebido}">
+	    			<p:ajax process="@this" update=":frmPedido:tabView" event="change" partialSubmit="true"/>
+	    		</p:selectBooleanCheckbox>
+    			<p:spacer width="5"/>
+    			<h:outputText id="recebidoNao" value="Não" rendered="#{not parcela.recebido}"/>
+    			<h:outputText id="recebidoSim" value="Sim" rendered="#{parcela.recebido}"/>
+    		</h:panelGroup>
+		</p:column>
+		
+		<p:column headerText="Data recebimento">
+			<p:calendar value="#{parcela.dataRecebimento}" pattern="dd/MM/yyyy" locale="pt"/>
+		</p:column>
+		
+	</p:dataTable>
+	
+          
+</ui:composition>

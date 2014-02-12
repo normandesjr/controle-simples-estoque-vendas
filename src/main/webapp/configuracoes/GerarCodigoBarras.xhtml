@@ -1,0 +1,35 @@
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="titulo">Gerar código de barras</ui:define>
+    
+    <ui:define name="corpo">
+    	<h:form id="frmCadastro">
+	    	<h1>Gerar código de barras</h1>
+	    	
+	    	<p:messages autoUpdate="true" closable="true" />
+	    	
+	    	<p:toolbar style="margin-top: 20px">
+	    		<p:toolbarGroup>
+	    			<p:commandButton value="Imprimir" id="botaoImprimir" />
+	    		</p:toolbarGroup>
+	    	</p:toolbar>
+	    	
+	    	<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+	    			columnClasses="rotulo, campo">
+
+				<p:outputLabel value="Peça" for="peca"/>
+	    		<p:selectOneMenu id="peca" value="#{gerarCodigoBarrasBean.peca}" 
+	    				filter="true" filterMatchMode="contains">
+	    			<f:selectItem itemLabel="Selecione" itemValue=""/>
+	    			<f:selectItems value="#{gerarCodigoBarrasBean.pecas}" var="peca" 
+	    				itemLabel="#{peca.codigo} - #{peca.nome}" itemValue="#{peca}"/>
+	    		</p:selectOneMenu>	    		
+	    	</p:panelGrid>
+    	</h:form>
+    </ui:define>
+</ui:composition>

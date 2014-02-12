@@ -1,0 +1,80 @@
+<ui:composition template="/WEB-INF/template/LayoutPadrao.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="titulo">Pesquisa de pedidos</ui:define>
+    
+    <ui:define name="corpo">
+    	<h:form id="frmPesquisa">
+	    	<h1>Pesquisa de pedidos</h1>
+	    	
+	    	<p:messages autoUpdate="true" closable="true" />
+	    	
+	    	<p:toolbar style="margin-top: 20px">
+	    		<p:toolbarGroup>
+                	<p:commandButton value="Pesquisar" action="#{pesquisaPedidoBean.pesquisar}"
+                    	update="@form" />
+                </p:toolbarGroup>
+	    	</p:toolbar>
+	    	
+	    	<p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+                	columnClasses="rotulo, campo">
+	            <p:outputLabel value="Data da venda" for="dataVenda"/>
+	            <p:calendar id="dataVenda" pattern="dd/MM/yyyy" locale="pt" 
+	            	value="#{pesquisaPedidoBean.filtro.dataVenda}"/>
+	            
+	            <p:outputLabel value="Cliente" for="cliente"/>
+	            <p:autoComplete id="cliente" completeMethod="#{pesquisaPedidoBean.sugerirClientes}"
+	    				forceSelection="true" var="c" itemLabel="#{c.nome}" itemValue="#{c}" 
+	    				converter="clienteConverter" minQueryLength="1" maxResults="15" size="40" 
+	    				dropdown="true" value="#{pesquisaPedidoBean.filtro.cliente}">
+	    		</p:autoComplete>
+	    		
+	    		<p:outputLabel value="Somente não recebidos?" for="naoRecebido"/>
+	    		<h:panelGroup>
+	    			<p:selectBooleanCheckbox id="naoRecebido" value="#{pesquisaPedidoBean.filtro.naoRecebido}" 
+	    				onchange="if ($(this).prop('checked')) { $('.sim_nao').text('Sim') } else {$('.sim_nao').text('Não')}" />
+	    			<p:spacer width="5"/>
+	    			<h:outputText styleClass="sim_nao" value="Não" rendered="#{not pesquisaPedidoBean.filtro.naoRecebido}"/>
+	    			<h:outputText styleClass="sim_nao" value="Sim" rendered="#{pesquisaPedidoBean.filtro.naoRecebido}"/>
+	    		</h:panelGroup>
+            </p:panelGrid>
+	    	
+	    	<p:dataTable id="clientesTable" value="#{pesquisaPedidoBean.pedidosFiltrados}" var="pedido"
+	    		style="margin-top: 20px" emptyMessage="Nenhum pedido encontrado." rows="30"
+	    		paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom">
+	    		<p:column headerText="Número" style="text-align: center; width: 100px">
+	    			<h:outputText value="#{pedido.codigo}"/>
+	    		</p:column>
+	    		<p:column headerText="Cliente">
+	    			<h:outputText value="#{pedido.cliente.nome}" />
+	    		</p:column>
+	    		<p:column headerText="Data venda">
+	    			<h:outputText value="#{pedido.data}">
+	    				<f:convertDateTime pattern="dd/MM/yyyy" locale="pt"/>
+	    			</h:outputText>
+	    		</p:column>
+	    		<p:column headerText="Desconto">
+	    			<h:outputText value="#{pedido.desconto}">
+	    				<f:convertNumber type="currency"/>
+	    			</h:outputText>
+	    		</p:column>
+	    		<p:column headerText="Valor total">
+	    			<h:outputText value="#{pedido.valorTotal}">
+	    				<f:convertNumber type="currency"/>
+	    			</h:outputText>
+	    		</p:column>
+	    		
+	    		<p:column style="width: 100px; text-align: center">
+	    			<p:button outcome="/pedidos/NovoPedido" icon="ui-icon-pencil" title="Editar">
+	    				<f:param name="pedido" value="#{pedido.codigo}"/>
+	    			</p:button>
+	    		</p:column>
+	    	</p:dataTable>
+	    	
+    	</h:form>
+    </ui:define>
+</ui:composition>
